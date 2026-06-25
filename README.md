@@ -194,9 +194,11 @@ exception/
 
 ### Phase 2 - Restaurant Module
 
-* [ ] Restaurant Entity
+* [x] Restaurant Entity
+* [x] Restaurant APIs
+* [x] Global Exception Handling
 * [ ] Food Item Entity
-* [ ] Restaurant APIs
+* [ ] Food Item APIs
 
 ### Phase 3 - Order Module
 
@@ -226,6 +228,9 @@ exception/
 * JWT Authentication
 * Database Design
 * Microservices
+* Request Validation using Bean Validation
+* Global Exception Handling
+* REST API Error Handling
 * Event-Driven Systems
 * Kafka Messaging
 * Containerization using Docker
