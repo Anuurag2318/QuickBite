@@ -76,11 +76,11 @@ Response:
 ## Architecture Implemented
 
 **Controller Layer** <br>
-        ↓
+        ↓ <br>
 **Service Layer** <br>
-        ↓
+        ↓ <br>
 **Repository Layer** <br>
-        ↓
+        ↓ <br>
 **PostgreSQL Database** <br>
 
 ---
