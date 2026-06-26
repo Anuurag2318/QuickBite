@@ -25,4 +25,9 @@ public class GlobalExceptionHandler {
     public String handleResponseNotFound(ResourceNotFoundException ex){
         return ex.getMessage();
     }
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleInvalidOrderStatus(InvalidOrderStatusException ex){
+        return ex.getMessage();
+    }
 }

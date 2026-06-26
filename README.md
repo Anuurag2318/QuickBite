@@ -36,11 +36,12 @@ The project is being developed incrementally, starting with a monolithic archite
 
 ### Restaurant Management
 *  Add Restaurant 
-* Get Restaurant by ID 
-* Get All Restaurants 
-* Update Restaurant 
-* Delete Restaurant 
-* Global Exception Handling
+*  Get Restaurant by ID 
+*  Get All Restaurants 
+*  Update Restaurant 
+*  Delete Restaurant 
+*  Global Exception Handling
+* Restaurant ↔ FoodItem Relationship (One-To-Many)
 
 ### Food Item Management
 * Add Food Item 
@@ -48,7 +49,7 @@ The project is being developed incrementally, starting with a monolithic archite
 * Get All Food Items 
 * Update Food Item 
 * Delete Food Item 
-* Restaurant ↔ FoodItem Relationship (One-To-Many)
+* FoodItem Relationship ↔  Restaurant(Many-To-One)
 
 ### Order Management
 * Place Order 
@@ -57,7 +58,10 @@ The project is being developed incrementally, starting with a monolithic archite
 * FoodItem ↔ OrderItem Relationship 
 * Automatic Total Amount Calculation 
 * Historical Price Storage 
-* Order Status Management (PLACED)
+* Order Status Management
+* Cancel Order 
+* Order Tracking 
+* Transaction Management
 ---
 
 ## Database Schema
@@ -211,6 +215,21 @@ Sample Response
   "status": "PLACED"
 }
 ```
+Get Orders By User
+
+GET /orders/user/{userId}?page=0&size=10
+
+Update Order Status
+
+PUT /orders/{orderId}/status
+
+Cancel Order
+
+PUT /orders/{orderId}/cancel
+
+Track Order
+
+GET /orders/{orderId}/track
 
 ---
 
@@ -306,13 +325,12 @@ Return Order Response
 
 Current Status:
 
-* BCrypt Password Encryption Implemented
-* JWT Token Generation Implemented
-* Spring Security Configured
-* JWT Token Validation Implemented
-* Protected APIs Implemented
+* BCrypt Password Encryption 
+* JWT Authentication
+* JWT Authorization
 * Stateless Authentication
-* Protected APIs using Spring Security
+* Protected APIs
+* Role-Based User Model
 
 ---
 
@@ -360,19 +378,36 @@ exception/
 
 * [x] Order Entity
 * [x] Order APIs
-* [ ] Order Tracking
+* [x] Order Tracking
 
-### Phase 4 - Event Driven Architecture
+### Phase 4 - Redis Caching
+* [ ] Redis Setup
+* [ ] Cache Restaurants
+* [ ] Cache Food Items
+* [ ] Cache Eviction
+* [ ] Cache Update
+
+### Phase 5 - Event Driven Architecture
 
 * [ ] Kafka Setup
 * [ ] Order Events
 * [ ] Notification Service
+* [ ] Inventory Events
 
-### Phase 5 - Deployment
+### Phase 6 - Deployment
 
 * [ ] Docker
 * [ ] Docker Compose
 * [ ] GitHub Documentation
+
+### Phase 7 - Microservices
+* [ ] API Gateway
+* [ ] Service Discovery
+* [ ] Config Server
+* [ ] User Service
+* [ ] Restaurant Service
+* [ ] Order Service
+* [ ] Notification Service
 
 ---
 
@@ -391,10 +426,14 @@ exception/
 * One-To-Many Mapping
 * Many-To-One Mapping
 * Foreign Keys
+* Pagination & Sorting
+* Transaction Management
+* Business Rule Validation
 * Event-Driven Systems
 * Kafka Messaging
-* Containerization using Docker
-* Event-Driven Architecture *(Upcoming)*
+* Order Lifecycle Management
+* Event-Driven Systems *(Upcoming)*
 * Redis Caching *(Upcoming)*
 * Kafka Messaging *(Upcoming)*
-* Docker Containerization *(Upcoming)*
+* Containerization using Docker *(Upcoming)*
+* Microservices Architecture *(Upcoming)*
