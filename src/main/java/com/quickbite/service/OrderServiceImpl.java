@@ -7,7 +7,6 @@ import com.quickbite.entity.*;
 import com.quickbite.exception.InvalidOrderStatusException;
 import com.quickbite.exception.ResourceNotFoundException;
 import com.quickbite.kafka.event.OrderPlacedEvent;
-import com.quickbite.kafka.producer.KafkaProducerService;
 import com.quickbite.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
