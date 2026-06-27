@@ -1,146 +1,117 @@
-# QuickBite Food Delivery Service
+# QuickBite - Event-Driven Food Delivery Backend
 
 ## Overview
 
-The QuickBite Food Delivery Service is the core business service of the QuickBite platform.
+QuickBite Food Delivery Backend is the core Order Service of the QuickBite platform built using Spring Boot and PostgreSQL.
 
-It manages user authentication, restaurant management, food item management, and order processing while publishing domain events to Apache Kafka using the Outbox Pattern.
+The service manages user authentication, restaurant management, food item management, order processing, Redis caching, and reliable event publishing using the Outbox Pattern.
 
-This service owns the core business logic and communicates asynchronously with the Notification Service through Kafka, enabling a scalable and loosely coupled microservices architecture.
+It publishes domain events to Apache Kafka, enabling asynchronous communication with downstream microservices such as the QuickBite Notification Service.
 
----
-
-# Responsibilities
-
-* User Registration & Authentication
-* Restaurant Management
-* Food Item Management
-* Order Management
-* Redis Caching
-* Kafka Event Publishing
-* Outbox Pattern
-* Transaction Management
-* Asynchronous Communication with Notification Service
+The project demonstrates production-ready backend development using Spring Boot, PostgreSQL, Redis, Apache Kafka, Docker, JWT Security, and event-driven architecture.
 
 ---
 
-# Tech Stack
-
-## Backend
+## Tech Stack
 
 * Java 17
 * Spring Boot
+* Spring Web
 * Spring Data JPA
 * Spring Security
 * Spring Validation
 * Spring Kafka
+* JWT Authentication
+* PostgreSQL
+* Redis
+* Apache Kafka
+* Docker & Docker Compose
 * Maven
 * Lombok
 
-## Database
-
-* PostgreSQL
-
-## Cache
-
-* Redis
-
-## Messaging
-
-* Apache Kafka
-
-## Infrastructure
-
-* Docker
-* Docker Compose
-
 ---
 
-# Key Features
+## Current Features
 
-## User Management
+### User Management
 
 * User Registration
 * User Login
-* JWT Authentication
-* JWT Authorization
 * BCrypt Password Encryption
+* JWT Token Generation
+* JWT Authentication & Authorization
+* Protected APIs
 * Role-Based User Model
 
----
+### Restaurant Management
+*  Add Restaurant
+*  Get Restaurant by ID
+*  Get All Restaurants
+*  Update Restaurant
+*  Delete Restaurant
+*  Global Exception Handling
+* Restaurant ↔ FoodItem Relationship (One-To-Many)
 
-## Restaurant Management
-
-* Add Restaurant
-* Update Restaurant
-* Delete Restaurant
-* Get Restaurant By ID
-* Get All Restaurants
-* One-To-Many Relationship with Food Items
-
----
-
-## Food Item Management
-
+### Food Item Management
 * Add Food Item
+* Get Food Item by ID
+* Get All Food Items
 * Update Food Item
 * Delete Food Item
-* Get Food Item By ID
-* Get All Food Items
-* Many-To-One Relationship with Restaurant
+* FoodItem Relationship ↔  Restaurant(Many-To-One)
 
----
-
-## Order Management
-
+### Order Management
 * Place Order
-* Cancel Order
-* Track Order
-* Update Order Status
+* OrderItem Entity
+* Order ↔ OrderItem Relationship
+* FoodItem ↔ OrderItem Relationship
 * Automatic Total Amount Calculation
 * Historical Price Storage
-* Pagination
+* Order Status Management
+* Cancel Order
+* Order Tracking
 * Transaction Management
 
----
+### Redis Caching
 
-## Redis Caching
-
-* Restaurant Caching
-* Food Item Caching
-* Automatic Cache Eviction
+* Redis Integration
+* Restaurant API Caching
+* Automatic Cache Eviction on Create, Update & Delete
 * Cache Expiration (TTL)
 * Cache Hit & Cache Miss Optimization
 
----
+### Event-Driven Architecture
 
-## Event-Driven Architecture
-
+* Apache Kafka Integration
 * Kafka Producer
 * OrderPlacedEvent Publishing
 * Outbox Pattern
-* Reliable Event Publishing
 * Scheduled Outbox Publisher
-* Apache Kafka Integration
+* Reliable Event Delivery
 * Asynchronous Communication with Notification Service
 
----
+### Dockerized Services
 
-# Database Schema
-
-## Users
-
-| Column   | Type   |
-| -------- | ------ |
-| id       | Long   |
-| name     | String |
-| email    | String |
-| password | String |
-| role     | Enum   |
+* Redis
+* Apache Kafka
+* Zookeeper
 
 ---
 
-## Restaurants
+## Database Schema
+
+### Users
+
+| Column   | Type               |
+| -------- | ------------------ |
+| id       | Long               |
+| name     | String             |
+| email    | String (Unique)    |
+| password | String (Encrypted) |
+| role     | Enum               |
+
+---
+### Restaurants
 
 | Column  | Type   |
 | ------- | ------ |
@@ -150,19 +121,19 @@ This service owns the core business logic and communicates asynchronously with t
 
 ---
 
-## Food Items
+### Food Items
 
-| Column        | Type   |
-| ------------- | ------ |
-| id            | Long   |
-| name          | String |
-| description   | String |
-| price         | Double |
-| restaurant_id | Long   |
+| Column        | Type      |
+| ------------- | --------- |
+| id            | Long      |
+| name          | String    |
+| description   | String    |
+| price         | Double    |
+| restaurant_id | Long (FK) |
 
 ---
 
-## Orders
+### Orders
 
 | Column       | Type          |
 | ------------ | ------------- |
@@ -170,113 +141,282 @@ This service owns the core business logic and communicates asynchronously with t
 | order_date   | LocalDateTime |
 | total_amount | Double        |
 | status       | Enum          |
-| user_id      | Long          |
+| user_id      | Long (FK)     |
 
 ---
 
-## Order Items
+### Order Items
 
-| Column       | Type    |
-| ------------ | ------- |
-| id           | Long    |
-| quantity     | Integer |
-| price        | Double  |
-| food_item_id | Long    |
-| order_id     | Long    |
+| Column       | Type      |
+| ------------ | --------- |
+| id           | Long      |
+| quantity     | Integer   |
+| price        | Double    |
+| food_item_id | Long (FK) |
+| order_id     | Long (FK) |
+---
+### Outbox Events
+
+| Column        | Type          |
+| ------------- | ------------- |
+| id            | Long          |
+| event_type    | String        |
+| payload       | String (JSON) |
+| status        | Enum          |
+| created_at    | LocalDateTime |
+| processed_at  | LocalDateTime |
+---
+
+## API Endpoints
+
+### Register User
+
+POST /auth/register
+
+Request:
+
+{
+"name": "Raj",
+"email": "[Raj@gmail.com](mailto:Raj@gmail.com)",
+"password": "password123"
+}
+
+Response:
+
+{
+"id": 1,
+"name": "Raj",
+"email": "[Raj@gmail.com](mailto:Raj@gmail.com)",
+"role": "CUSTOMER"
+}
+
+### Login User
+POST /auth/login
+
+Request:
+
+{
+"email": "Raj@gmail.com",
+"password": "password123"
+}
+
+Response:
+
+{
+"token": "eyJhbGciOiJIUzI1NiJ9..."
+}
+---
+
+### Restaurant APIs
+
+* **POST** `/restaurants`
+* **GET** `/restaurants`
+* **GET** `/restaurants/{id}`
+* **PUT** `/restaurants/{id}`
+* **DELETE** `/restaurants/{id}`
 
 ---
 
-## Outbox Events
+### Food Item APIs
 
-| Column       | Type          |
-| ------------ | ------------- |
-| id           | Long          |
-| event_type   | String        |
-| payload      | TEXT          |
-| status       | Enum          |
-| created_at   | LocalDateTime |
-| processed_at | LocalDateTime |
+* **POST** `/food-items`
+* **GET** `/food-items`
+* **GET** `/food-items/{id}`
+* **PUT** `/food-items/{id}`
+* **DELETE** `/food-items/{id}`
 
 ---
 
-# API Endpoints
+### Order APIs
 
-## Authentication
+#### Place Order
 
-| Method | Endpoint       |
-| ------ | -------------- |
-| POST   | /auth/register |
-| POST   | /auth/login    |
+**POST** `/orders`
 
----
+Sample Request
 
-## Restaurants
-
-| Method | Endpoint          |
-| ------ | ----------------- |
-| POST   | /restaurants      |
-| GET    | /restaurants      |
-| GET    | /restaurants/{id} |
-| PUT    | /restaurants/{id} |
-| DELETE | /restaurants/{id} |
-
----
-
-## Food Items
-
-| Method | Endpoint         |
-| ------ | ---------------- |
-| POST   | /food-items      |
-| GET    | /food-items      |
-| GET    | /food-items/{id} |
-| PUT    | /food-items/{id} |
-| DELETE | /food-items/{id} |
-
----
-
-## Orders
-
-| Method | Endpoint              |
-| ------ | --------------------- |
-| POST   | /orders               |
-| GET    | /orders/user/{userId} |
-| PUT    | /orders/{id}/status   |
-| PUT    | /orders/{id}/cancel   |
-| GET    | /orders/{id}/track    |
-
----
-
-# Service Architecture
-
-```text
-                Client
-                   │
-                   ▼
-           REST Controllers
-                   │
-                   ▼
-            Service Layer
-                   │
-        ┌──────────┴──────────┐
-        ▼                     ▼
-   PostgreSQL             Redis Cache
-        │
-        ▼
-  Outbox Event Table
-        │
-        ▼
-Scheduled Outbox Publisher
-        │
-        ▼
-    Kafka Producer
-        │
-        ▼
-QuickBite Notification Service
+```json
+{
+  "userId": 1,
+  "items": [
+    {
+      "foodItemId": 1,
+      "quantity": 2
+    },
+    {
+      "foodItemId": 2,
+      "quantity": 1
+    }
+  ]
+}
 ```
 
+Sample Response
+
+```json
+{
+  "id": 1,
+  "totalAmount": 837.0,
+  "status": "PLACED"
+}
+```
+Get Orders By User
+
+GET /orders/user/{userId}?page=0&size=10
+
+Update Order Status
+
+PUT /orders/{orderId}/status
+
+Cancel Order
+
+PUT /orders/{orderId}/cancel
+
+Track Order
+
+GET /orders/{orderId}/track
+
 ---
 
-# Order Processing Flow
+## Architecture Implemented
+
+```text
+Controller Layer
+        │
+        ▼
+Service Layer
+        │
+        ▼
+Repository Layer
+        │
+        ▼
+PostgreSQL Database
+```
+### After Redis
+```text
+                 Client
+                    │
+                    ▼
+             Spring Boot APIs
+                    │
+          ┌─────────┴─────────┐
+          ▼                   ▼
+      Redis Cache       PostgreSQL
+          │                   │
+          └─────────┬─────────┘
+                    ▼
+               Response
+```
+
+### After Kafka + Outbox Pattern
+```text
+                 Client
+                    │
+                    ▼
+             Spring Boot APIs
+                    │
+               Order Service
+                    │
+            Database Transaction
+                    │
+        ┌───────────┴───────────┐
+        ▼                       ▼
+   Orders Table           Outbox Table
+                                │
+                                ▼
+                    Scheduled Publisher
+                                │
+                                ▼
+                         Apache Kafka
+                                │
+                ┌───────────────┴───────────────┐
+                ▼                               ▼
+     Notification Service          Future Inventory Service
+```
+
+### After Kafka Integration
+```text
+                    Client
+                       │
+                       ▼
+              QuickBite Food Delivery Backend
+                       │
+        ┌──────────────┴──────────────┐
+        ▼                             ▼
+     Redis Cache                PostgreSQL
+                                      │
+                                      ▼
+                               Outbox Events
+                                      │
+                                      ▼
+                           Scheduled Publisher
+                                      │
+                                      ▼
+                                Apache Kafka
+                                      │
+                                      ▼
+                     QuickBite Notification Service
+```
+---
+
+## Microservices
+
+Current System
+
+### QuickBite Food Delivery Backend (This Repository)
+
+Responsible for:
+
+- User Management
+- Restaurant Management
+- Food Item Management
+- Order Management
+- Redis Caching
+- Kafka Event Publishing
+- Outbox Pattern
+
+### Notification Service (Separate Project)
+
+Responsible for:
+
+- Consuming Kafka Events
+- Processing Order Created Events
+- Sending Order Notifications
+- Email Integration (Upcoming)
+
+## Authentication Flow
+
+```text
+User Login
+    │
+    ▼
+JWT Token Generated
+    │
+    ▼
+Client Stores Token
+    │
+    ▼
+Client Sends Token in Authorization Header
+    │
+    ▼
+JwtAuthenticationFilter Intercepts Request
+    │
+    ▼
+JWT Token Validation
+    │
+    ▼
+Extract User Email
+    │
+    ▼
+Load User Details From Database
+    │
+    ▼
+Store Authentication In SecurityContextHolder
+    │
+    ▼
+Access Protected API
+```
+## Order Processing Flow
 
 ```text
 Client Places Order
@@ -291,10 +431,10 @@ Validate Food Items
 Create Order
         │
         ▼
-Save Order Items
+Calculate Total Amount
         │
         ▼
-Calculate Total Amount
+Create Order Items
         │
         ▼
 Save Order
@@ -316,43 +456,8 @@ Read Pending Events
         │
         ▼
 Publish Event to Kafka
-        │
-        ▼
-Notification Service Consumes Event
-        │
-        ▼
-Customer Receives Email
 ```
-
----
-
-# Outbox Pattern Flow
-
-```text
-Order Created
-      │
-      ▼
-Save Order
-      │
-      ▼
-Save Outbox Event
-      │
-      ▼
-Transaction Commit
-      │
-      ▼
-Scheduler Reads Pending Events
-      │
-      ▼
-Publish Event to Kafka
-      │
-      ▼
-Mark Event as PROCESSED
-```
-
----
-
-# Redis Flow
+## Redis Caching Flow
 
 ```text
 Client Request
@@ -366,55 +471,99 @@ Check Redis Cache
 Cache Hit  Cache Miss
  │         │
  ▼         ▼
-Return    Query Database
-Cached         │
-Data           ▼
-         Store in Redis
-               │
-               ▼
-        Return Response
+Return    Fetch From Database
+Cached          │
+Data            ▼
+           Store in Redis
+                │
+                ▼
+         Return Response
 ```
 
----
-
-# Running the Service
-
-## Prerequisites
-
-* Java 17
-* PostgreSQL
-* Redis
-* Apache Kafka
-* Docker Desktop
-* QuickBite Notification Service (Optional for complete event flow)
-
----
-
-## Start Infrastructure
-
-```bash
-docker-compose up -d
+## Outbox Pattern Flow
+```text
+Client Places Order
+│
+▼
+Save Order
+│
+▼
+Save Outbox Event (PENDING)
+│
+▼
+Database Commit
+│
+▼
+Scheduler Reads Pending Events
+│
+▼
+Publish Event To Kafka
+│
+▼
+Update Status → PROCESSED
+│
+▼
+Consumer Receives Event
 ```
-
----
-
-## Run Application
-
-```bash
-mvn spring-boot:run
-```
-
-The service starts on:
+## Event Processing Flow
 
 ```text
-http://localhost:8080
+Client Places Order
+        │
+        ▼
+Save Order in Database
+        │
+        ▼
+Create Outbox Event
+        │
+        ▼
+Database Commit
+        │
+        ▼
+Scheduled Publisher Reads Pending Events
+        │
+        ▼
+Publish Event to Kafka
+        │
+        ▼
+Notification Service Consumes Event
+        │
+        ▼
+Send Notification
+        │
+        ▼
+Mark Outbox Event as PROCESSED
 ```
+---
+### Authentication Process
+
+1. User logs in using email and password.
+2. Password is verified using BCrypt.
+3. A JWT token is generated and returned to the client.
+4. The client sends the token in the Authorization header for protected APIs.
+5. JwtAuthenticationFilter validates the token.
+6. User details are loaded from the database.
+7. Spring Security stores the authenticated user in SecurityContextHolder.
+8. Protected APIs become accessible.
 
 ---
 
-# Project Structure
+## Security
 
-```text
+Current Status:
+
+* BCrypt Password Encryption
+* JWT Authentication
+* JWT Authorization
+* Stateless Authentication
+* Protected APIs
+* Role-Based User Model
+
+---
+
+## Project Structure
+
+### Quickbite Microservice
 src/main/java/com/quickbite
 
 controller/
@@ -425,48 +574,129 @@ dto/
 config/
 security/
 filter/
+util/
 exception/
-redis/
-kafka/
-scheduler/
-```
+
+### Notification Microservice
+
+src/main/java/com/quickbite/notification
+
+config/
+consumer/
+event/
+service/
 
 ---
 
-# Current Status
+## Microservices
 
-* ✅ Authentication
-* ✅ Restaurant Module
-* ✅ Food Item Module
-* ✅ Order Module
-* ✅ Redis Integration
-* ✅ Apache Kafka Integration
-* ✅ Outbox Pattern
-* ✅ Notification Service Integration
-* ✅ SMTP Email Notifications
+The QuickBite platform currently consists of multiple independent services.
+
+### QuickBite Food Delivery Service (This Repository)
+
+Responsible for:
+
+- User Management
+- Restaurant Management
+- Food Item Management
+- Order Management
+- Redis Caching
+- Kafka Event Publishing
+- Outbox Pattern
+
+### QuickBite Notification Service
+
+Consumes `OrderPlacedEvent` messages from Kafka and sends order confirmation email notifications.
+
+For more details, refer to the Notification Service README.
+
+---
+## Progress Tracker
+
+### Phase 1 - User Module
+
+* [x] Spring Boot Setup
+* [x] PostgreSQL Configuration
+* [x] User Entity
+* [x] User Repository
+* [x] Registration API
+* [x] BCrypt Password Encryption
+* [x] Login API
+* [x] JWT Token Generation
+* [x] JWT Request Validation
+* [x] Protected APIs
+
+### Phase 2 - Restaurant Module
+
+* [x] Restaurant Entity
+* [x] Restaurant APIs
+* [x] Global Exception Handling
+* [x] Food Item Entity
+* [x] Food Item APIs
+
+### Phase 3 - Order Module
+
+* [x] Order Entity
+* [x] Order APIs
+* [x] Order Tracking
+
+### Phase 4 - Redis Caching
+* [x] Redis Setup
+* [x] Restaurant API Caching
+* [x] FoodItem API Caching
+* [x] Cache Eviction
+* [x] Cache Expiration (TTL)
+* [x] Cache Hit & Cache Miss Verification
+* [x] Redis CLI Verification
+
+### Phase 5 - Event Driven Architecture
+
+* [x] Apache Kafka Setup
+* [x] Kafka Producer
+* [x] Kafka Consumer
+* [x] Order Created Event
+* [x] Outbox Pattern
+* [x] Scheduled Outbox Publisher
+* [x] Reliable Event Delivery
+* [x] Notification Microservice Integration
+* [x] Notification Service Integration
+
+### Phase 6 - Deployment
+
+* [x] Docker
+* [x] Docker Compose
+* [x] GitHub Documentation
+
+### Phase 7 - Microservices
+
+* [x] Food Delivery Service
+* [x] Notification Service
 
 ---
 
-# Learning Outcomes
+## Learning Outcomes
 
 * Spring Boot REST APIs
 * Layered Architecture
 * Spring Security
 * JWT Authentication
-* PostgreSQL
+* Database Design
+* Request Validation using Bean Validation
+* Global Exception Handling
+* REST API Error Handling
+* JPA Entity Relationships
+* One-To-Many Mapping
+* Many-To-One Mapping
+* Foreign Keys
+* Pagination & Sorting
+* Transaction Management
 * Redis Caching
 * Apache Kafka
 * Event-Driven Architecture
+* Spring Scheduler
+* Microservice Communication
+* Eventual Consistency
+* Docker & Docker Compose
+* Apache Kafka Event Publishing
 * Outbox Pattern
-* Transaction Management
 * Asynchronous Microservices Communication
-* Docker
-* Microservices Design
-
----
-
-## Author
-
-**Anurag Tiwari**
-
-The QuickBite Food Delivery Service is the core business service of the QuickBite platform. It demonstrates production-oriented backend development using Spring Boot, PostgreSQL, Redis, Apache Kafka, JWT Security, and the Outbox Pattern while enabling asynchronous communication with independent microservices through an event-driven architecture.
