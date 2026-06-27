@@ -154,6 +154,7 @@ The project demonstrates production-ready backend development using Spring Boot,
 | price        | Double    |
 | food_item_id | Long (FK) |
 | order_id     | Long (FK) |
+
 ---
 ### Outbox Events
 
