@@ -4,7 +4,7 @@
 
 QuickBite is an event-driven food delivery platform built using Java and Spring Boot following a microservices architecture.
 
-The project began as a monolithic backend and is being incrementally transformed into independent microservices that communicate asynchronously using Apache Kafka. The architecture focuses on scalability, reliability, loose coupling, and production-ready design patterns such as Redis Caching and the Outbox Pattern.
+The project started as a monolithic backend and was incrementally evolved into independent microservices that communicate asynchronously using Apache Kafka. It demonstrates modern backend engineering concepts including JWT Authentication, Redis Caching, the Outbox Pattern, Kafka-based asynchronous messaging, and SMTP email notifications.
 
 This repository serves as the parent project containing all QuickBite microservices.
 
@@ -12,43 +12,36 @@ This repository serves as the parent project containing all QuickBite microservi
 
 # Project Architecture
 
-```
+```text
 QuickBite/
 │
+├── README.md
 ├── docker-compose.yml
 │
 ├── quickbite-food-delivery/
-│      ├── Order & Restaurant Service
-│      ├── REST APIs
+│      ├── User Management
+│      ├── Restaurant Management
+│      ├── Food Item Management
+│      ├── Order Management
 │      ├── PostgreSQL
 │      ├── Redis Cache
 │      ├── Kafka Producer
 │      └── Outbox Pattern
 │
-├── quickbite-notification-service/
-│      ├── Kafka Consumer
-│      └── Email Notifications (Upcoming)
-│
-├── inventory-service/          (Upcoming)
-├── payment-service/            (Upcoming)
-├── api-gateway/                (Upcoming)
-├── config-server/              (Upcoming)
-└── service-registry/           (Upcoming)
+└── quickbite-notification-service/
+       ├── Kafka Consumer
+       ├── Gmail SMTP
+       └── Email Notifications
 ```
 
 ---
 
 # Microservices
 
-| Service                        | Description                                                            | Status                       |
-| ------------------------------ | ---------------------------------------------------------------------- | ---------------------------- |
-| quickbite-food-delivery        | Core backend responsible for Users, Restaurants, Food Items and Orders | ✅ Completed                  |
-| quickbite-notification-service | Consumes Kafka events and sends notifications                          | ✅ Kafka Integration Complete |
-| inventory-service              | Inventory Management                                                   | 🚧 Upcoming                  |
-| payment-service                | Payment Processing                                                     | 🚧 Upcoming                  |
-| api-gateway                    | Single Entry Point                                                     | 🚧 Upcoming                  |
-| config-server                  | Centralized Configuration                                              | 🚧 Upcoming                  |
-| service-registry               | Service Discovery                                                      | 🚧 Upcoming                  |
+| Service                        | Description                                                                               | Status      |
+| ------------------------------ | ----------------------------------------------------------------------------------------- | ----------- |
+| quickbite-food-delivery        | Core backend responsible for authentication, restaurants, food items and order processing | ✅ Completed |
+| quickbite-notification-service | Consumes Kafka events and sends email notifications asynchronously                        | ✅ Completed |
 
 ---
 
@@ -61,6 +54,8 @@ QuickBite/
 * Spring Data JPA
 * Spring Security
 * Spring Validation
+* Spring Kafka
+* Spring Mail
 * Maven
 * Lombok
 
@@ -68,7 +63,7 @@ QuickBite/
 
 * PostgreSQL
 
-## Caching
+## Cache
 
 * Redis
 
@@ -83,17 +78,17 @@ QuickBite/
 
 ---
 
-# Current Architecture
+# System Architecture
 
-```
+```text
                  Client
                     │
                     ▼
-          quickbite-food-delivery
+        quickbite-food-delivery
                     │
       ┌─────────────┴─────────────┐
       ▼                           ▼
-   PostgreSQL                  Redis
+ PostgreSQL                    Redis
       │
       ▼
  Outbox Event Table
@@ -102,47 +97,53 @@ QuickBite/
  Scheduled Publisher
       │
       ▼
-     Kafka Broker
+      Kafka Broker
       │
       ▼
 quickbite-notification-service
       │
       ▼
-Email Notification (Upcoming)
+ Gmail SMTP
+      │
+      ▼
+Customer Email
 ```
 
 ---
 
-# Event-Driven Flow
+# Event Flow
 
-```
+```text
 Client Places Order
         │
         ▼
-Save Order in Database
+Validate Request
+        │
+        ▼
+Save Order
         │
         ▼
 Save Event in Outbox Table
         │
         ▼
-Database Transaction Commits
+Transaction Commit
         │
         ▼
-Scheduler Reads Pending Events
+Scheduler Publishes Event
         │
         ▼
-Publish Event to Kafka
+Kafka Topic (order-created)
         │
         ▼
-Notification Service Consumes Event
+Notification Service
         │
         ▼
-Send Email (Upcoming)
+Send Email Notification
 ```
 
 ---
 
-# Implemented Features
+# Features
 
 ## Authentication
 
@@ -155,29 +156,37 @@ Send Email (Upcoming)
 
 * CRUD Operations
 * Redis Caching
-* Cache Eviction
+* Automatic Cache Eviction
 
 ## Food Item Management
 
 * CRUD Operations
 * Redis Caching
-* Cache Eviction
+* Automatic Cache Eviction
 
 ## Order Management
 
 * Place Order
 * Cancel Order
-* Track Order
+* Order Tracking
 * Pagination
 * Transaction Management
 
 ## Event-Driven Architecture
 
-* Kafka Producer
-* Kafka Consumer
+* Apache Kafka Producer
+* Apache Kafka Consumer
 * Outbox Pattern
 * Reliable Event Publishing
 * Scheduled Event Processing
+
+## Notification Service
+
+* Kafka Event Consumption
+* JSON Event Deserialization
+* Gmail SMTP Email Notifications
+* Asynchronous Processing
+* Independent Microservice
 
 ---
 
@@ -187,8 +196,8 @@ Send Email (Upcoming)
 
 * Java 17
 * Maven
-* Docker Desktop
 * PostgreSQL
+* Docker Desktop
 
 ---
 
@@ -217,96 +226,33 @@ Start the services in the following order:
 
 # Repository Structure
 
-```
+```text
 QuickBite/
 │
 ├── README.md
 ├── docker-compose.yml
-│
 ├── quickbite-food-delivery/
-│
-├── quickbite-notification-service/
-│
-├── inventory-service/        (Upcoming)
-├── payment-service/          (Upcoming)
-├── api-gateway/              (Upcoming)
-├── config-server/            (Upcoming)
-└── service-registry/         (Upcoming)
+└── quickbite-notification-service/
 ```
 
 ---
 
-# Roadmap
+# Project Highlights
 
-## Phase 1
-
-* Spring Boot Backend
-* JWT Authentication
-* Restaurant APIs
-* Food Item APIs
-* Order APIs
-
-Status: ✅ Completed
-
----
-
-## Phase 2
-
-* Redis Integration
-* Cache Eviction
-* TTL
-* Cache Optimization
-
-Status: ✅ Completed
-
----
-
-## Phase 3
-
-* Apache Kafka
-* Event-Driven Architecture
-* Notification Service
+* Layered Spring Boot Architecture
+* JWT Authentication & Authorization
+* PostgreSQL with Spring Data JPA
+* Redis Caching
+* Transaction Management
+* Apache Kafka Messaging
 * Outbox Pattern
-
-Status: ✅ Completed
-
----
-
-## Phase 4
-
-* SMTP Email Notifications
-
-Status: 🚧 In Progress
+* Event-Driven Communication
+* Gmail SMTP Email Notifications
+* Dockerized Local Infrastructure
 
 ---
 
-## Phase 5
-
-* Inventory Service
-
-Status: 🚧 Planned
-
----
-
-## Phase 6
-
-* Payment Service
-
-Status: 🚧 Planned
-
----
-
-## Phase 7
-
-* API Gateway
-* Config Server
-* Service Registry
-
-Status: 🚧 Planned
-
----
-
-## Learning Outcomes
+# Learning Outcomes
 
 * Spring Boot
 * Spring Security
@@ -317,10 +263,10 @@ Status: 🚧 Planned
 * Apache Kafka
 * Event-Driven Architecture
 * Outbox Pattern
+* Spring Mail
 * Transaction Management
 * Docker
-* Microservices Architecture
-* Distributed Systems Fundamentals
+* Microservices Fundamentals
 
 ---
 
@@ -328,4 +274,4 @@ Status: 🚧 Planned
 
 **Anurag Tiwari**
 
-This project is being built incrementally to demonstrate backend development best practices, distributed systems concepts, and production-ready microservices architecture using the Spring ecosystem.
+QuickBite demonstrates the evolution of a Spring Boot application from a monolithic backend into an event-driven microservices platform. The project showcases modern backend engineering practices including secure authentication, Redis caching, reliable event publishing using the Outbox Pattern, Apache Kafka messaging, asynchronous email notifications, and Docker-based local infrastructure.

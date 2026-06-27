@@ -2,21 +2,19 @@
 
 ## Overview
 
-The QuickBite Notification Service is an independent microservice responsible for consuming order events from Apache Kafka and sending notifications to users.
+The QuickBite Notification Service is an independent microservice responsible for consuming order events from Apache Kafka and sending order confirmation emails to customers.
 
-Currently, the service consumes `OrderPlacedEvent` messages published by the Food Delivery Service and logs order confirmations. In future iterations, it will be extended to send real email notifications using SMTP.
-
-The Notification Service is completely decoupled from the Food Delivery Service and communicates asynchronously through Kafka.
+The service listens for `OrderPlacedEvent` messages published by the Food Delivery Service, processes the event asynchronously, and sends an email notification using Gmail SMTP. Communication between services is completely decoupled through Apache Kafka, making the system scalable and resilient.
 
 ---
 
 # Responsibilities
 
 * Consume Kafka Events
-* Process OrderPlacedEvent
-* Send Order Notifications
-* Handle Failed Message Processing
-* Support Future Email Integration
+* Process `OrderPlacedEvent`
+* Deserialize JSON Messages
+* Send Order Confirmation Emails
+* Asynchronous Event Processing
 * Remain Independent from Business Logic
 
 ---
@@ -28,12 +26,18 @@ The Notification Service is completely decoupled from the Food Delivery Service 
 * Java 17
 * Spring Boot
 * Spring Kafka
+* Spring Mail
 * Maven
 * Lombok
 
 ## Messaging
 
 * Apache Kafka
+
+## Email
+
+* Gmail SMTP
+* JavaMailSender
 
 ## Infrastructure
 
@@ -42,24 +46,25 @@ The Notification Service is completely decoupled from the Food Delivery Service 
 
 ---
 
-# Current Features
+# Features
 
 ## Kafka Consumer
 
 * Kafka Listener
 * Consumer Group Support
 * JSON Event Deserialization
-* Independent Event Processing
 * Automatic Event Consumption
+* Asynchronous Processing
 
 ---
 
-## Notification Processing
+## Email Notification
 
-* Receive OrderPlacedEvent
-* Extract Order Information
-* Process Notification Request
-* Log Order Confirmation
+* Consume `OrderPlacedEvent`
+* Extract Customer Information
+* Generate Order Confirmation Email
+* Send Email using Gmail SMTP
+* Log Notification Processing
 
 ---
 
@@ -78,11 +83,13 @@ The Notification Service is completely decoupled from the Food Delivery Service 
            Deserialize JSON Event
                       │
                       ▼
-         Notification Processing
+              Email Service
                       │
                       ▼
-          Console Notification
-         (Email Integration Upcoming)
+             Gmail SMTP Server
+                      │
+                      ▼
+           Customer Receives Email
 ```
 
 ---
@@ -109,10 +116,13 @@ Kafka Listener
 Deserialize Event
           │
           ▼
-Process Notification
+Email Service
           │
           ▼
-Order Confirmation
+JavaMailSender
+          │
+          ▼
+Customer Email Inbox
 ```
 
 ---
@@ -129,6 +139,8 @@ This event is published whenever a customer successfully places an order.
 {
   "orderId": 10,
   "userId": 1,
+  "customerName": "Anurag Tiwari",
+  "customerEmail": "anurag@example.com",
   "totalAmount": 850.0,
   "status": "PLACED"
 }
@@ -136,12 +148,14 @@ This event is published whenever a customer successfully places an order.
 
 ### Fields
 
-| Field       | Type   | Description             |
-| ----------- | ------ | ----------------------- |
-| orderId     | Long   | Unique Order Identifier |
-| userId      | Long   | Customer Identifier     |
-| totalAmount | Double | Total Order Amount      |
-| status      | String | Current Order Status    |
+| Field         | Type   | Description             |
+| ------------- | ------ | ----------------------- |
+| orderId       | Long   | Unique Order Identifier |
+| userId        | Long   | Customer Identifier     |
+| customerName  | String | Customer Name           |
+| customerEmail | String | Customer Email Address  |
+| totalAmount   | Double | Total Order Amount      |
+| status        | String | Current Order Status    |
 
 ---
 
@@ -167,7 +181,7 @@ localhost:9092
 
 ---
 
-# Current Processing Flow
+# Processing Flow
 
 ```text
 Receive Kafka Message
@@ -179,33 +193,16 @@ Deserialize JSON
 Create OrderPlacedEvent Object
         │
         ▼
-Read Event Details
+Extract Customer Details
         │
         ▼
-Log Notification
-```
-
----
-
-# Future Email Workflow
-
-```text
-Receive Kafka Event
+Generate Email
         │
         ▼
-Extract User Information
+Send Email using Gmail SMTP
         │
         ▼
-Generate Email Template
-        │
-        ▼
-Connect SMTP Server
-        │
-        ▼
-Send Email
-        │
-        ▼
-Log Success / Failure
+Log Success
 ```
 
 ---
@@ -250,51 +247,27 @@ src/main/java/com/quickbite/notification
 config/
 consumer/
 event/
+service/
 ```
 
 ---
 
 # Current Status
 
-## Kafka Consumer
-
-* ✅ Completed
-
-## OrderPlacedEvent Consumption
-
-* ✅ Completed
-
-## JSON Event Deserialization
-
-* ✅ Completed
-
-## Independent Microservice
-
-* ✅ Completed
-
-## Email Notification (SMTP)
-
-* 🚧 In Progress
-
-## HTML Email Templates
-
-* 🚧 Planned
-
-## Retry Mechanism
-
-* 🚧 Planned
-
-## Dead Letter Queue (DLQ)
-
-* 🚧 Planned
+* ✅ Kafka Consumer
+* ✅ JSON Event Deserialization
+* ✅ OrderPlacedEvent Consumption
+* ✅ Gmail SMTP Integration
+* ✅ Email Notification Service
+* ✅ Independent Microservice
+* ✅ Asynchronous Communication
 
 ---
 
 # Future Enhancements
 
-* SMTP Email Integration
 * HTML Email Templates
-* Email Retry Mechanism
+* Retry Mechanism for Failed Emails
 * Dead Letter Queue (DLQ)
 * SMS Notifications
 * Push Notifications
@@ -308,10 +281,12 @@ event/
 * Apache Kafka Consumer
 * Event-Driven Communication
 * Asynchronous Processing
-* Microservices Architecture
-* JSON Deserialization
 * Spring Kafka
+* Spring Mail
+* Gmail SMTP Integration
+* JSON Serialization & Deserialization
 * Consumer Groups
+* Microservices Architecture
 * Loose Coupling Between Services
 
 ---
@@ -320,4 +295,4 @@ event/
 
 **Anurag Tiwari**
 
-This service demonstrates asynchronous communication in a microservices architecture by consuming Kafka events independently from the core Food Delivery Service. It forms the foundation for scalable notification processing and future email delivery capabilities.
+The Notification Service demonstrates asynchronous communication in a microservices architecture by consuming Kafka events independently from the Food Delivery Service. It processes business events, sends real email notifications using Gmail SMTP, and showcases event-driven design principles for scalable backend systems.

@@ -2,11 +2,11 @@
 
 ## Overview
 
-The QuickBite Food Delivery Service is the core backend service of the QuickBite platform.
+The QuickBite Food Delivery Service is the core business service of the QuickBite platform.
 
-It is responsible for user authentication, restaurant management, food item management, order processing, Redis caching, and reliable event publishing using the Outbox Pattern.
+It manages user authentication, restaurant management, food item management, and order processing while publishing domain events to Apache Kafka using the Outbox Pattern.
 
-This service owns the business logic for placing and managing orders while publishing domain events to Kafka for downstream microservices.
+This service owns the core business logic and communicates asynchronously with the Notification Service through Kafka, enabling a scalable and loosely coupled microservices architecture.
 
 ---
 
@@ -20,6 +20,7 @@ This service owns the business logic for placing and managing orders while publi
 * Kafka Event Publishing
 * Outbox Pattern
 * Transaction Management
+* Asynchronous Communication with Notification Service
 
 ---
 
@@ -32,6 +33,7 @@ This service owns the business logic for placing and managing orders while publi
 * Spring Data JPA
 * Spring Security
 * Spring Validation
+* Spring Kafka
 * Maven
 * Lombok
 
@@ -54,7 +56,7 @@ This service owns the business logic for placing and managing orders while publi
 
 ---
 
-# Features
+# Key Features
 
 ## User Management
 
@@ -106,7 +108,7 @@ This service owns the business logic for placing and managing orders while publi
 
 * Restaurant Caching
 * Food Item Caching
-* Cache Eviction
+* Automatic Cache Eviction
 * Cache Expiration (TTL)
 * Cache Hit & Cache Miss Optimization
 
@@ -115,11 +117,12 @@ This service owns the business logic for placing and managing orders while publi
 ## Event-Driven Architecture
 
 * Kafka Producer
-* OrderPlacedEvent
+* OrderPlacedEvent Publishing
 * Outbox Pattern
 * Reliable Event Publishing
-* Scheduled Event Publisher
-* Spring Events
+* Scheduled Outbox Publisher
+* Apache Kafka Integration
+* Asynchronous Communication with Notification Service
 
 ---
 
@@ -249,23 +252,26 @@ This service owns the business logic for placing and managing orders while publi
                 Client
                    │
                    ▼
-             REST Controllers
+           REST Controllers
                    │
                    ▼
-             Service Layer
+            Service Layer
                    │
-          ┌────────┴────────┐
-          ▼                 ▼
-    PostgreSQL          Redis Cache
-          │
-          ▼
-     Outbox Table
-          │
-          ▼
- Scheduled Publisher
-          │
-          ▼
-     Kafka Producer
+        ┌──────────┴──────────┐
+        ▼                     ▼
+   PostgreSQL             Redis Cache
+        │
+        ▼
+  Outbox Event Table
+        │
+        ▼
+Scheduled Outbox Publisher
+        │
+        ▼
+    Kafka Producer
+        │
+        ▼
+QuickBite Notification Service
 ```
 
 ---
@@ -301,6 +307,21 @@ Store Event in Outbox Table
         │
         ▼
 Return Success Response
+
+Background Scheduler
+
+        │
+        ▼
+Read Pending Events
+        │
+        ▼
+Publish Event to Kafka
+        │
+        ▼
+Notification Service Consumes Event
+        │
+        ▼
+Customer Receives Email
 ```
 
 ---
@@ -342,16 +363,16 @@ Check Redis Cache
  ┌────┴────┐
  │         │
  ▼         ▼
-Hit      Miss
+Cache Hit  Cache Miss
  │         │
  ▼         ▼
-Return   Query Database
-Data        │
-            ▼
-     Store in Redis
-            │
-            ▼
-      Return Response
+Return    Query Database
+Cached         │
+Data           ▼
+         Store in Redis
+               │
+               ▼
+        Return Response
 ```
 
 ---
@@ -363,8 +384,9 @@ Data        │
 * Java 17
 * PostgreSQL
 * Redis
-* Kafka
+* Apache Kafka
 * Docker Desktop
+* QuickBite Notification Service (Optional for complete event flow)
 
 ---
 
@@ -384,7 +406,7 @@ mvn spring-boot:run
 
 The service starts on:
 
-```
+```text
 http://localhost:8080
 ```
 
@@ -413,41 +435,15 @@ scheduler/
 
 # Current Status
 
-## Authentication
-
-* ✅ Completed
-
-## Restaurant Module
-
-* ✅ Completed
-
-## Food Item Module
-
-* ✅ Completed
-
-## Order Module
-
-* ✅ Completed
-
-## Redis Integration
-
-* ✅ Completed
-
-## Kafka Integration
-
-* ✅ Completed
-
-## Outbox Pattern
-
-* ✅ Completed
-
-## Notification Service Integration
-
-* ✅ Completed
-
-## SMTP Email Notifications
-
-* 🚧 In Progress
+* ✅ Authentication
+* ✅ Restaurant Module
+* ✅ Food Item Module
+* ✅ Order Module
+* ✅ Redis Integration
+* ✅ Apache Kafka Integration
+* ✅ Outbox Pattern
+* ✅ Notification Service Integration
+* ✅ SMTP Email Notifications
 
 ---
 
@@ -458,11 +454,12 @@ scheduler/
 * Spring Security
 * JWT Authentication
 * PostgreSQL
-* Redis
+* Redis Caching
 * Apache Kafka
+* Event-Driven Architecture
 * Outbox Pattern
 * Transaction Management
-* Event-Driven Architecture
+* Asynchronous Microservices Communication
 * Docker
 * Microservices Design
 
@@ -472,4 +469,4 @@ scheduler/
 
 **Anurag Tiwari**
 
-This service is the core business service of the QuickBite platform and demonstrates production-oriented backend development practices using Spring Boot, Redis, Kafka, and the Outbox Pattern.
+The QuickBite Food Delivery Service is the core business service of the QuickBite platform. It demonstrates production-oriented backend development using Spring Boot, PostgreSQL, Redis, Apache Kafka, JWT Security, and the Outbox Pattern while enabling asynchronous communication with independent microservices through an event-driven architecture.
