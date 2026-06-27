@@ -98,6 +98,7 @@ The project is being developed incrementally, starting with a monolithic archite
 | password | String (Encrypted) |
 | role     | Enum               |
 
+---
 ### Restaurants
 
 | Column  | Type   |
@@ -141,7 +142,7 @@ The project is being developed incrementally, starting with a monolithic archite
 | price        | Double    |
 | food_item_id | Long (FK) |
 | order_id     | Long (FK) |
-
+---
 ### Outbox Events
 
 | Column        | Type          |
