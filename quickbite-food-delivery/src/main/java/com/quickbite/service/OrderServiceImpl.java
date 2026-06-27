@@ -65,6 +65,8 @@ public class OrderServiceImpl implements OrderService{
         OrderPlacedEvent event=OrderPlacedEvent.builder()
                 .orderId(order.getId())
                 .userId(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
                 .build();

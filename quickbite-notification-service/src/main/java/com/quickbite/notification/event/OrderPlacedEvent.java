@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class OrderPlacedEvent {
     private Long orderId;
     private Long userId;
+    private String email;
+    private String name;
     private Double totalAmount;
     private String status;
 }
