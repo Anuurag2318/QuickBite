@@ -10,6 +10,8 @@ It publishes domain events to Apache Kafka, enabling asynchronous communication 
 
 The project demonstrates production-ready backend development using Spring Boot, PostgreSQL, Redis, Apache Kafka, Docker, JWT Security, and event-driven architecture.
 
+It also integrates Google Gemini through Spring AI to provide intelligent food recommendations based on user preferences, previous orders, and the current menu.
+
 ---
 
 ## Tech Stack
@@ -28,6 +30,8 @@ The project demonstrates production-ready backend development using Spring Boot,
 * Docker & Docker Compose
 * Maven
 * Lombok
+* Spring AI
+* Google Gemini API
 
 ---
 
@@ -89,6 +93,15 @@ The project demonstrates production-ready backend development using Spring Boot,
 * Scheduled Outbox Publisher
 * Reliable Event Delivery
 * Asynchronous Communication with Notification Service
+
+### AI-Powered Food Recommendation
+
+* Spring AI Integration
+* Google Gemini Integration
+* Prompt-Based Food Recommendations
+* Personalized Recommendations using Order History
+* AI Response Parsing into Structured JSON
+* Intelligent Fallback for New Users
 
 ### Dockerized Services
 
@@ -276,6 +289,27 @@ PUT /orders/{orderId}/cancel
 Track Order
 
 GET /orders/{orderId}/track
+
+---
+
+### AI Recommendation APIs
+
+#### Recommend Food by Prompt
+
+**GET** `/ai/recommend`
+
+Example:
+GET /ai/recommend?prompt=Suggest a spicy dinner under ₹500
+
+#### Personalized Recommendation
+
+**GET** `/ai/recommend/{userId}`
+
+Example:
+
+GET /ai/recommend/1
+
+Uses the user's previous orders (if available) along with the current menu to generate personalized food recommendations. For new users, recommendations are generated from the available menu.
 
 ---
 
@@ -535,7 +569,37 @@ Send Notification
         ▼
 Mark Outbox Event as PROCESSED
 ```
+
+## AI Recommendation Flow
+
+```text
+Client Request
+      │
+      ▼
+Fetch Current Menu
+      │
+      ▼
+Fetch User Order History (Optional)
+      │
+      ▼
+Build AI Prompt
+      │
+      ▼
+Google Gemini API
+      │
+      ▼
+Structured JSON Response
+      │
+      ▼
+Map to FoodRecommendationResponse
+      │
+      ▼
+Return Personalized Recommendations
+```
+
 ---
+
+
 ### Authentication Process
 
 1. User logs in using email and password.
@@ -673,6 +737,13 @@ For more details, refer to the Notification Service README.
 * [x] Food Delivery Service
 * [x] Notification Service
 
+### Phase 8 - AI Integration
+
+* [x] Spring AI Integration
+* [x] Google Gemini Integration
+* [x] Prompt-Based Food Recommendation
+* [x] Personalized Recommendation using Order History
+* [x] Structured JSON Response Parsing
 ---
 
 ## Learning Outcomes
@@ -701,3 +772,9 @@ For more details, refer to the Notification Service README.
 * Apache Kafka Event Publishing
 * Outbox Pattern
 * Asynchronous Microservices Communication
+* Spring AI
+* Prompt Engineering
+* Google Gemini Integration
+* AI-Powered REST APIs
+* Personalized Recommendation Systems
+* Structured AI Response Parsing
