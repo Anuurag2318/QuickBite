@@ -395,27 +395,27 @@ PostgreSQL Database
 
 ### Spring AI Integeration
 ```text
-User ID
-    │
-    ▼
-Fetch User Orders
-    │
-    ├──────────────┐
-    │              │
-Orders Found   No Orders
-    │              │
-    ▼              ▼
-Use History     Use Menu
-    │              │
-    └──────┬───────┘
-           ▼
-Generate Prompt
-           ▼
-Gemini AI
-           ▼
-JSON Response
-           ▼
-FoodRecommendationResponse
+                User ID
+                    │
+                    ▼
+                Fetch User Orders
+                    │
+                    ├──────────────┐
+                    │              │
+                Orders Found   No Orders
+                    │              │
+                    ▼              ▼
+                Use History     Use Menu
+                    │              │
+                    └──────┬───────┘
+                           ▼
+                Generate Prompt
+                           ▼
+                Gemini AI
+                           ▼
+                JSON Response
+                           ▼
+                FoodRecommendationResponse
 ```
 
 ---
